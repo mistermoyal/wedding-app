@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Vendor {
+  id             String  @id @default(cuid())
+  name           String
+  category       String?
+  estimatedTotal Float   @default(0)
+  totalAmount    Float   @default(0)
+  estimation     Float?
+  additionalFees Float   @default(0)
+
+  // Pricing model
+  pricingModel       String  @default("FIXED") // FIXED | PER_GUEST
+  pricePerGuest      Float?
+  fixedGuestCountTom Int?
+  fixedGuestCountEve Int?
+  includeChildren    Boolean @default(false)
+  guestCountBasis    String  @default("INVITED") // INVITED | CONFIRMED_PRESENT
+
+  // Payment responsibility
+  paymentResponsibility String @default("SPLIT_50_50") // TOM_100 | EVE_100 | SPLIT_50_50 | CUSTOM_SPLIT | PER_INVITEE_BY_FAMILY
+  customTomPercentage   Float?
+  customEvePercentage   Float?
+
+  // Allocation mode (Total vs Remaining)
+  allocationMode               String @default("TOTAL_STANDARD") // TOTAL_STANDARD | REMAINING_ONLY
+  remainingResponsibility      String @default("SPLIT_50_50") // TOM_100 | EVE_100 | SPLIT_50_50 | CUSTOM_SPLIT | PER_INVITEE_BY_FAMILY
+  customRemainingTomPercentage Float?
+  customRemainingEvePercentage Float?
+
+  notes     String?
+  status    String    @default("ACTIF") // ACTIF | ARCHIVÉ
+  payments  Payment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Payment {
+  id         String    @id @default(cuid())
+  vendorId   String
+  vendor     Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  amount     Float
+  payer      String // TOM | EVE | COMMON
+  method     String?
+  date       DateTime?
+  memo       String?
+  hasReceipt Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Guest {
+  id               String   @id @default(cuid())
+  name             String
+  side             String // TOM | EVE
+  saveTheDate      Boolean  @default(false)
+  invited          Boolean  @default(false)
+  rsvp             String   @default("PENDING") // YES | NO | PENDING
+  numGuests        Int      @default(1) // Invited Adults
+  numChildren3to13 Int      @default(0) // Invited Kids
+  numAdultsPresent Int      @default(0) // Coming Adults
+  numChildrenPresent Int    @default(0) // Coming Kids
+  numNotPresent    Int      @default(0)
+  numPresent       Int      @default(0)
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Settings {
+  id          String   @id @default("main")
+  weddingDate DateTime
+  groomName   String   @default("Tom")
+  brideName   String   @default("Eve")
+  rateIlsToEur Float   @default(0.25)
+}
