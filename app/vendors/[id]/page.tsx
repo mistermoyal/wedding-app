@@ -47,6 +47,7 @@ import { VendorForm } from "@/components/VendorForm";
 import { PaymentForm } from "@/components/PaymentForm";
 import { formatMoney } from "@/lib/utils";
 import { useCurrency } from "@/context/CurrencyContext";
+import { Input } from "@/components/ui/input";
 
 const getResponsibilityLabel = (slug: string) => {
     switch (slug) {
