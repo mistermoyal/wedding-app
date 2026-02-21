@@ -11,6 +11,7 @@ export async function GET() {
         });
         return NextResponse.json(vendors);
     } catch (error) {
+        console.error("Failed to fetch vendors:", error);
         return NextResponse.json({ error: "Failed to fetch vendors" }, { status: 500 });
     }
 }
@@ -44,6 +45,10 @@ export async function POST(req: Request) {
         });
         return NextResponse.json(vendor);
     } catch (error) {
-        return NextResponse.json({ error: "Failed to create vendor" }, { status: 500 });
+        console.error("Failed to create vendor:", error);
+        return NextResponse.json(
+            { error: "Failed to create vendor", details: String(error) },
+            { status: 500 }
+        );
     }
 }
