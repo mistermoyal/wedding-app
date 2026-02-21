@@ -1,6 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+const parseNullableInt = (value: unknown) => {
+    if (value === "" || value === null || value === undefined) return null;
+    if (typeof value === "number") return Number.isNaN(value) ? null : value;
+    if (typeof value === "string") {
+        const parsed = parseInt(value, 10);
+        return Number.isNaN(parsed) ? null : parsed;
+    }
+    return null;
+};
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
@@ -30,8 +40,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
                 additionalFees: (data as any).additionalFees === "" ? 0 : parseFloat((data as any).additionalFees || "0"),
                 pricingModel: data.pricingModel,
                 pricePerGuest: data.pricePerGuest,
-                fixedGuestCountTom: data.fixedGuestCountTom === "" ? null : data.fixedGuestCountTom,
-                fixedGuestCountEve: data.fixedGuestCountEve === "" ? null : data.fixedGuestCountEve,
+                fixedGuestCountTom: parseNullableInt(data.fixedGuestCountTom),
+                fixedGuestCountEve: parseNullableInt(data.fixedGuestCountEve),
                 includeChildren: data.includeChildren,
                 guestCountBasis: data.guestCountBasis,
                 paymentResponsibility: data.paymentResponsibility,

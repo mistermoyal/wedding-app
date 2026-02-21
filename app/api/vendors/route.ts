@@ -3,6 +3,16 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+const parseNullableInt = (value: unknown) => {
+    if (value === "" || value === null || value === undefined) return null;
+    if (typeof value === "number") return Number.isNaN(value) ? null : value;
+    if (typeof value === "string") {
+        const parsed = parseInt(value, 10);
+        return Number.isNaN(parsed) ? null : parsed;
+    }
+    return null;
+};
+
 export async function GET() {
     try {
         const vendors = await prisma.vendor.findMany({
@@ -29,8 +39,8 @@ export async function POST(req: Request) {
                 additionalFees: (data as any).additionalFees === "" ? 0 : parseFloat((data as any).additionalFees || "0"),
                 pricingModel: data.pricingModel || "FIXED",
                 pricePerGuest: data.pricePerGuest,
-                fixedGuestCountTom: data.fixedGuestCountTom,
-                fixedGuestCountEve: data.fixedGuestCountEve,
+                fixedGuestCountTom: parseNullableInt(data.fixedGuestCountTom),
+                fixedGuestCountEve: parseNullableInt(data.fixedGuestCountEve),
                 includeChildren: data.includeChildren || false,
                 guestCountBasis: data.guestCountBasis || "INVITED",
                 paymentResponsibility: data.paymentResponsibility || "SPLIT_50_50",
