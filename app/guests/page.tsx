@@ -171,7 +171,7 @@ export default function GuestsPage() {
                     }
                 }}>
                     <DialogTrigger asChild>
-                        <Button className="bg-slate-900 text-white hover:bg-slate-800 rounded-xl" onClick={() => setIsAddOpen(true)}>
+                        <Button className="w-full sm:w-auto bg-slate-900 text-white hover:bg-slate-800 rounded-xl" onClick={() => setIsAddOpen(true)}>
                             <UserPlus className="w-4 h-4 mr-2" /> Ajouter un invité
                         </Button>
                     </DialogTrigger>
@@ -196,12 +196,12 @@ export default function GuestsPage() {
             </div>
 
             {/* Filters & Search Box */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col items-center gap-6">
+            <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col items-center gap-6">
                 <div className="relative w-full max-w-xl group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <Input
                         placeholder="Rechercher un invité..."
-                        className="pl-11 h-12 bg-slate-50/50 border-slate-200 rounded-xl transition-all"
+                        className="pl-11 h-11 sm:h-12 bg-slate-50/50 border-slate-200 rounded-xl transition-all"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -209,7 +209,7 @@ export default function GuestsPage() {
 
                 <div className="flex flex-col items-center gap-6 w-full">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
-                        <TabsList className="bg-slate-100 p-1 rounded-full h-12 w-full grid grid-cols-3">
+                        <TabsList className="bg-slate-100 p-1 rounded-full h-11 sm:h-12 w-full grid grid-cols-3">
                             {[
                                 { id: "all", label: "Tous", count: guests.reduce((acc, g) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0) },
                                 { id: "tom", label: "Tom", count: guests.filter(g => g.side === 'TOM').reduce((acc, g) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0) },
@@ -228,7 +228,7 @@ export default function GuestsPage() {
                     </Tabs>
 
                     {/* Quick Stats Bar */}
-                    <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl">
                         <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4">
                             <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
                                 <Users className="w-5 h-5" />
@@ -258,7 +258,7 @@ export default function GuestsPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 w-full max-w-3xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl">
                         <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4">
                             <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
                                 <Baby className="w-5 h-5" />
@@ -315,7 +315,8 @@ export default function GuestsPage() {
 
             {/* Main Table */}
             <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-                <Table className="relative">
+                <div className="overflow-x-auto">
+                    <Table className="relative min-w-[760px]">
                     <TableHeader className="bg-slate-50/80 backdrop-blur sticky top-0 z-10 border-b">
                         <TableRow>
                             <TableHead className="w-[60px] pl-6">
@@ -434,7 +435,8 @@ export default function GuestsPage() {
                             ))
                         )}
                     </TableBody>
-                </Table>
+                    </Table>
+                </div>
             </div>
         </div>
     );

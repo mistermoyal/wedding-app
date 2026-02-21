@@ -12,8 +12,13 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
-export function Sidebar() {
+type SidebarProps = {
+    className?: string;
+};
+
+export function Sidebar({ className }: SidebarProps) {
     const [settings, setSettings] = useState<any>(null);
 
     useEffect(() => {
@@ -43,7 +48,7 @@ export function Sidebar() {
     const groomName = settings?.groomName || "Tom";
 
     return (
-        <aside className="w-64 border-r bg-white flex flex-col h-screen sticky top-0">
+        <aside className={cn("w-64 border-r bg-white flex flex-col h-full md:h-screen md:sticky md:top-0", className)}>
             <div className="p-6 border-bottom">
                 <h1 className="text-xl font-bold text-slate-900">{brideName} & {groomName} ❤️</h1>
                 <p className="text-xs text-slate-500 uppercase tracking-tight">
