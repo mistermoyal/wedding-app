@@ -268,18 +268,12 @@ export default function GuestsPage() {
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enfants 0-3</span>
                                     <span className="text-lg font-bold text-slate-900">{childStats.total0to3}</span>
                                 </div>
-                                <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                                    {activeTab === "all" ? (
-                                        <>
-                                            <span>Tom: {childStats.tom0to3}</span>
-                                            <span>Eve: {childStats.eve0to3}</span>
-                                        </>
-                                    ) : activeTab === "tom" ? (
+                                {activeTab === "all" && (
+                                    <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
                                         <span>Tom: {childStats.tom0to3}</span>
-                                    ) : (
                                         <span>Eve: {childStats.eve0to3}</span>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4">
@@ -291,18 +285,12 @@ export default function GuestsPage() {
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enfants 3-13</span>
                                     <span className="text-lg font-bold text-slate-900">{childStats.total3to13}</span>
                                 </div>
-                                <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                                    {activeTab === "all" ? (
-                                        <>
-                                            <span>Tom: {childStats.tom3to13}</span>
-                                            <span>Eve: {childStats.eve3to13}</span>
-                                        </>
-                                    ) : activeTab === "tom" ? (
+                                {activeTab === "all" && (
+                                    <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
                                         <span>Tom: {childStats.tom3to13}</span>
-                                    ) : (
                                         <span>Eve: {childStats.eve3to13}</span>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
