@@ -124,7 +124,7 @@ export default function VendorsPage() {
                     throw new Error("Upload failed");
                 }
                 const uploaded = await uploadRes.json();
-                payload.contractUrl = uploaded.url;
+                payload.contractUrl = uploaded.downloadUrl || uploaded.url;
                 payload.contractName = uploaded.name;
             }
 

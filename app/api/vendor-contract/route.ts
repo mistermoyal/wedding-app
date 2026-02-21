@@ -14,12 +14,14 @@ export async function POST(request: Request) {
 
         const filename = (file.name || "contract.pdf").replace(/[^a-zA-Z0-9._-]/g, "_");
         const blob = await put(`contracts/${Date.now()}-${filename}`, file, {
-            access: "public",
+            // @ts-expect-error private store access
+            access: "private",
             contentType: file.type || "application/pdf",
         });
 
         return NextResponse.json({
             url: blob.url,
+            downloadUrl: blob.downloadUrl,
             name: file.name || filename,
         });
     } catch (error) {
