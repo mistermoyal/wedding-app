@@ -35,12 +35,12 @@ export async function GET() {
             })),
 
             guestStats: {
-                totalInvited: guests.reduce((acc: number, g: any) => acc + g.numGuests + g.numChildren3to13, 0),
-                totalConfirmed: guests.reduce((acc: number, g: any) => acc + g.numAdultsPresent + g.numChildrenPresent, 0),
-                tomInvited: guests.filter((g: any) => g.side === 'TOM').reduce((acc: number, g: any) => acc + g.numGuests + g.numChildren3to13, 0),
-                eveInvited: guests.filter((g: any) => g.side === 'EVE').reduce((acc: number, g: any) => acc + g.numGuests + g.numChildren3to13, 0),
-                tomConfirmed: guests.filter((g: any) => g.side === 'TOM').reduce((acc: number, g: any) => acc + g.numAdultsPresent + g.numChildrenPresent, 0),
-                eveConfirmed: guests.filter((g: any) => g.side === 'EVE').reduce((acc: number, g: any) => acc + g.numAdultsPresent + g.numChildrenPresent, 0),
+                totalInvited: guests.reduce((acc: number, g: any) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0),
+                totalConfirmed: guests.reduce((acc: number, g: any) => acc + g.numAdultsPresent + g.numChildrenPresent + (g.numChildren0to3Present || 0), 0),
+                tomInvited: guests.filter((g: any) => g.side === 'TOM').reduce((acc: number, g: any) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0),
+                eveInvited: guests.filter((g: any) => g.side === 'EVE').reduce((acc: number, g: any) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0),
+                tomConfirmed: guests.filter((g: any) => g.side === 'TOM').reduce((acc: number, g: any) => acc + g.numAdultsPresent + g.numChildrenPresent + (g.numChildren0to3Present || 0), 0),
+                eveConfirmed: guests.filter((g: any) => g.side === 'EVE').reduce((acc: number, g: any) => acc + g.numAdultsPresent + g.numChildrenPresent + (g.numChildren0to3Present || 0), 0),
                 rsvpRate: guests.length > 0
                     ? (guests.filter((g: any) => g.rsvp !== 'PENDING').length / guests.length) * 100
                     : 0,

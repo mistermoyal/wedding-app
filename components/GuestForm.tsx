@@ -27,8 +27,10 @@ export function GuestForm({ initialData, onSubmit, onCancel, loading }: GuestFor
         rsvp: initialData?.rsvp || "PENDING",
         numGuests: initialData?.numGuests || 1, // Invited Adults
         numChildren3to13: initialData?.numChildren3to13 || 0, // Invited Kids
+        numChildren0to3: initialData?.numChildren0to3 || 0, // Invited Toddlers
         numAdultsPresent: initialData?.numAdultsPresent || 0, // Coming Adults
         numChildrenPresent: initialData?.numChildrenPresent || 0, // Coming Kids
+        numChildren0to3Present: initialData?.numChildren0to3Present || 0, // Coming Toddlers
         saveTheDate: initialData?.saveTheDate ?? true, // Default to true as per user request
         invited: initialData?.invited ?? false,
         notes: initialData?.notes || "",
@@ -81,7 +83,7 @@ export function GuestForm({ initialData, onSubmit, onCancel, loading }: GuestFor
                         <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
                         Invitation
                     </h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="numGuests" className="text-xs font-semibold text-slate-600 uppercase">Nb adultes</Label>
                             <Input
@@ -94,13 +96,24 @@ export function GuestForm({ initialData, onSubmit, onCancel, loading }: GuestFor
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="numChildren" className="text-xs font-semibold text-slate-600 uppercase">Nb enfants</Label>
+                            <Label htmlFor="numChildren3to13" className="text-xs font-semibold text-slate-600 uppercase">Nb enfants 3-13</Label>
                             <Input
-                                id="numChildren"
+                                id="numChildren3to13"
                                 type="number"
                                 min="0"
                                 value={formData.numChildren3to13}
                                 onChange={(e) => handleChange("numChildren3to13", parseInt(e.target.value) || 0)}
+                                className="h-9"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="numChildren0to3" className="text-xs font-semibold text-slate-600 uppercase">Nb enfants 0-3</Label>
+                            <Input
+                                id="numChildren0to3"
+                                type="number"
+                                min="0"
+                                value={formData.numChildren0to3}
+                                onChange={(e) => handleChange("numChildren0to3", parseInt(e.target.value) || 0)}
                                 className="h-9"
                             />
                         </div>
@@ -112,7 +125,7 @@ export function GuestForm({ initialData, onSubmit, onCancel, loading }: GuestFor
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                         Confirmation (Présents)
                     </h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="numAdultsPresent" className="text-xs font-semibold text-emerald-700 uppercase">Nb adultes</Label>
                             <Input
@@ -125,13 +138,24 @@ export function GuestForm({ initialData, onSubmit, onCancel, loading }: GuestFor
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="numChildrenPresent" className="text-xs font-semibold text-emerald-700 uppercase">Nb enfants</Label>
+                            <Label htmlFor="numChildrenPresent" className="text-xs font-semibold text-emerald-700 uppercase">Nb enfants 3-13</Label>
                             <Input
                                 id="numChildrenPresent"
                                 type="number"
                                 min="0"
                                 value={formData.numChildrenPresent}
                                 onChange={(e) => handleChange("numChildrenPresent", parseInt(e.target.value) || 0)}
+                                className="h-9 border-emerald-100 focus-visible:ring-emerald-500"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="numChildren0to3Present" className="text-xs font-semibold text-emerald-700 uppercase">Nb enfants 0-3</Label>
+                            <Input
+                                id="numChildren0to3Present"
+                                type="number"
+                                min="0"
+                                value={formData.numChildren0to3Present}
+                                onChange={(e) => handleChange("numChildren0to3Present", parseInt(e.target.value) || 0)}
                                 className="h-9 border-emerald-100 focus-visible:ring-emerald-500"
                             />
                         </div>

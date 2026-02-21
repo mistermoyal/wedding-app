@@ -29,10 +29,14 @@ export async function POST(req: Request) {
                 rsvp: data.rsvp || "PENDING",
                 numGuests: data.numGuests || 1,
                 numChildren3to13: data.numChildren3to13 || 0,
+                numChildren0to3: data.numChildren0to3 || 0,
                 numAdultsPresent: data.numAdultsPresent || 0,
                 numChildrenPresent: data.numChildrenPresent || 0,
+                numChildren0to3Present: data.numChildren0to3Present || 0,
                 numNotPresent: 0,
-                numPresent: (data.numAdultsPresent || 0) + (data.numChildrenPresent || 0),
+                numPresent: (data.numAdultsPresent || 0)
+                    + (data.numChildrenPresent || 0)
+                    + (data.numChildren0to3Present || 0),
                 notes: data.notes,
             },
         });
@@ -65,10 +69,14 @@ export async function PUT(req: Request) {
                     rsvp: data.rsvp,
                     numGuests: data.numGuests,
                     numChildren3to13: data.numChildren3to13,
+                    numChildren0to3: data.numChildren0to3,
                     numAdultsPresent: data.numAdultsPresent,
                     numChildrenPresent: data.numChildrenPresent,
+                    numChildren0to3Present: data.numChildren0to3Present,
                     numNotPresent: data.numNotPresent,
-                    numPresent: (data.numAdultsPresent || 0) + (data.numChildrenPresent || 0),
+                    numPresent: (data.numAdultsPresent || 0)
+                        + (data.numChildrenPresent || 0)
+                        + (data.numChildren0to3Present || 0),
                     notes: data.notes,
                 },
             });

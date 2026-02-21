@@ -102,11 +102,25 @@ export default function GuestsPage() {
 
     const stats = useMemo(() => {
         return {
-            total: currentGuests.reduce((acc, g) => acc + g.numGuests + g.numChildren3to13, 0),
-            confirmed: currentGuests.reduce((acc, g) => acc + g.numAdultsPresent + g.numChildrenPresent, 0),
-            pending: currentGuests.filter(g => g.rsvp === "PENDING").reduce((acc, g) => acc + g.numGuests + g.numChildren3to13, 0),
+            total: currentGuests.reduce((acc, g) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0),
+            confirmed: currentGuests.reduce((acc, g) => acc + g.numAdultsPresent + g.numChildrenPresent + (g.numChildren0to3Present || 0), 0),
+            pending: currentGuests
+                .filter(g => g.rsvp === "PENDING")
+                .reduce((acc, g) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0),
         };
     }, [currentGuests]);
+
+    const childStats = useMemo(() => {
+        const bySide = (side: "TOM" | "EVE") => guests.filter((g) => g.side === side);
+        return {
+            total0to3: guests.reduce((acc, g) => acc + (g.numChildren0to3 || 0), 0),
+            total3to13: guests.reduce((acc, g) => acc + g.numChildren3to13, 0),
+            tom0to3: bySide("TOM").reduce((acc, g) => acc + (g.numChildren0to3 || 0), 0),
+            tom3to13: bySide("TOM").reduce((acc, g) => acc + g.numChildren3to13, 0),
+            eve0to3: bySide("EVE").reduce((acc, g) => acc + (g.numChildren0to3 || 0), 0),
+            eve3to13: bySide("EVE").reduce((acc, g) => acc + g.numChildren3to13, 0),
+        };
+    }, [guests]);
 
     const toggleSelect = (id: string, e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
@@ -196,9 +210,9 @@ export default function GuestsPage() {
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
                         <TabsList className="bg-slate-100 p-1 rounded-full h-12 w-full grid grid-cols-3">
                             {[
-                                { id: "all", label: "Tous", count: guests.reduce((acc, g) => acc + g.numGuests + g.numChildren3to13, 0) },
-                                { id: "tom", label: "Tom", count: guests.filter(g => g.side === 'TOM').reduce((acc, g) => acc + g.numGuests + g.numChildren3to13, 0) },
-                                { id: "eve", label: "Eve", count: guests.filter(g => g.side === 'EVE').reduce((acc, g) => acc + g.numGuests + g.numChildren3to13, 0) }
+                                { id: "all", label: "Tous", count: guests.reduce((acc, g) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0) },
+                                { id: "tom", label: "Tom", count: guests.filter(g => g.side === 'TOM').reduce((acc, g) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0) },
+                                { id: "eve", label: "Eve", count: guests.filter(g => g.side === 'EVE').reduce((acc, g) => acc + g.numGuests + g.numChildren3to13 + (g.numChildren0to3 || 0), 0) }
                             ].map((tab) => (
                                 <TabsTrigger
                                     key={tab.id}
@@ -239,6 +253,29 @@ export default function GuestsPage() {
                             <div className="flex flex-col">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">En attente</span>
                                 <span className="text-lg font-bold text-orange-600 leading-none">{stats.pending}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 w-full max-w-3xl">
+                        <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enfants 0-3</span>
+                                <span className="text-lg font-bold text-slate-900">{childStats.total0to3}</span>
+                            </div>
+                            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+                                <span>Tom: {childStats.tom0to3}</span>
+                                <span>Eve: {childStats.eve0to3}</span>
+                            </div>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enfants 3-13</span>
+                                <span className="text-lg font-bold text-slate-900">{childStats.total3to13}</span>
+                            </div>
+                            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+                                <span>Tom: {childStats.tom3to13}</span>
+                                <span>Eve: {childStats.eve3to13}</span>
                             </div>
                         </div>
                     </div>
@@ -344,20 +381,31 @@ export default function GuestsPage() {
                                     <TableCell className="text-center">
                                         <div className="inline-flex flex-col items-center">
                                             <span className="text-base font-bold text-slate-700 leading-none">{guest.numGuests}</span>
-                                            {guest.numChildren3to13 > 0 && <span className="text-[10px] text-slate-400 font-medium mt-1 uppercase tracking-tight">+{guest.numChildren3to13} enfants</span>}
+                                            {guest.numChildren3to13 > 0 && (
+                                                <span className="text-[10px] text-slate-400 font-medium mt-1 uppercase tracking-tight">
+                                                    +{guest.numChildren3to13} enfants 3-13
+                                                </span>
+                                            )}
+                                            {(guest.numChildren0to3 || 0) > 0 && (
+                                                <span className="text-[10px] text-slate-400 font-medium uppercase tracking-tight">
+                                                    +{guest.numChildren0to3 || 0} enfants 0-3
+                                                </span>
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <div className={cn(
                                             "inline-flex flex-col items-center p-2 rounded-xl min-w-[3.5rem]",
-                                            (guest.numAdultsPresent + guest.numChildrenPresent) > 0 ? "bg-emerald-500 text-white" : "bg-slate-100 opacity-20"
+                                            (guest.numAdultsPresent + guest.numChildrenPresent + (guest.numChildren0to3Present || 0)) > 0 ? "bg-emerald-500 text-white" : "bg-slate-100 opacity-20"
                                         )}>
                                             <span className="text-base font-bold leading-none">
-                                                {guest.numAdultsPresent + guest.numChildrenPresent || 0}
+                                                {guest.numAdultsPresent + guest.numChildrenPresent + (guest.numChildren0to3Present || 0) || 0}
                                             </span>
-                                            {(guest.numAdultsPresent > 0 || guest.numChildrenPresent > 0) && (
+                                            {(guest.numAdultsPresent > 0 || guest.numChildrenPresent > 0 || (guest.numChildren0to3Present || 0) > 0) && (
                                                 <span className="text-[9px] font-medium mt-0.5 uppercase opacity-90 leading-none">
-                                                    {guest.numAdultsPresent}a {guest.numChildrenPresent > 0 && `+${guest.numChildrenPresent}e`}
+                                                    {guest.numAdultsPresent}a
+                                                    {guest.numChildrenPresent > 0 && ` +${guest.numChildrenPresent}e`}
+                                                    {(guest.numChildren0to3Present || 0) > 0 && ` +${guest.numChildren0to3Present || 0}b`}
                                                 </span>
                                             )}
                                         </div>

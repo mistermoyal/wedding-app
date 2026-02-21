@@ -236,7 +236,19 @@ async function seedGuests(wb: XLSX.WorkBook) {
             const numNotPresent = Math.round(safeNumber(ws[XLSX.utils.encode_cell({ r: row - 1, c: 9 })]?.v));
             const numPresent = Math.round(safeNumber(ws[XLSX.utils.encode_cell({ r: row - 1, c: 10 })]?.v));
             await prisma.guest.create({
-                data: { name: name.trim(), side: config.side, saveTheDate, invited, rsvp, numGuests, numChildren3to13: numChildren, numNotPresent: numNotPresent, numPresent: numPresent },
+                data: {
+                    name: name.trim(),
+                    side: config.side,
+                    saveTheDate,
+                    invited,
+                    rsvp,
+                    numGuests,
+                    numChildren3to13: numChildren,
+                    numChildren0to3: 0,
+                    numChildren0to3Present: 0,
+                    numNotPresent: numNotPresent,
+                    numPresent: numPresent,
+                },
             });
             count++;
         }
