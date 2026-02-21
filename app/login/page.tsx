@@ -81,7 +81,7 @@ export default function LoginPage() {
                         Access
                     </p>
                     <h1 className="mt-2 text-3xl font-semibold text-slate-900">
-                        Eve &amp; Tom
+                        Eve &amp; Tom!
                     </h1>
                     <p className="mt-1 text-sm text-slate-500">August 9, 2026</p>
                 </div>
