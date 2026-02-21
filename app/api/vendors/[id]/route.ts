@@ -11,6 +11,26 @@ const parseNullableInt = (value: unknown) => {
     return null;
 };
 
+const parseFloatOr = (value: unknown, fallback: number) => {
+    if (value === "" || value === null || value === undefined) return fallback;
+    if (typeof value === "number") return Number.isNaN(value) ? fallback : value;
+    if (typeof value === "string") {
+        const parsed = parseFloat(value);
+        return Number.isNaN(parsed) ? fallback : parsed;
+    }
+    return fallback;
+};
+
+const parseNullableFloat = (value: unknown) => {
+    if (value === "" || value === null || value === undefined) return null;
+    if (typeof value === "number") return Number.isNaN(value) ? null : value;
+    if (typeof value === "string") {
+        const parsed = parseFloat(value);
+        return Number.isNaN(parsed) ? null : parsed;
+    }
+    return null;
+};
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
@@ -34,23 +54,23 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             data: {
                 name: data.name,
                 category: data.category,
-                estimatedTotal: data.estimatedTotal,
-                totalAmount: data.totalAmount,
-                estimation: ((data as any).estimation === "" || (data as any).estimation === undefined) ? null : parseFloat((data as any).estimation),
-                additionalFees: (data as any).additionalFees === "" ? 0 : parseFloat((data as any).additionalFees || "0"),
+                estimatedTotal: parseFloatOr(data.estimatedTotal, 0),
+                totalAmount: parseFloatOr(data.totalAmount, 0),
+                estimation: parseNullableFloat((data as any).estimation),
+                additionalFees: parseFloatOr((data as any).additionalFees, 0),
                 pricingModel: data.pricingModel,
-                pricePerGuest: data.pricePerGuest,
+                pricePerGuest: parseFloatOr(data.pricePerGuest, 0),
                 fixedGuestCountTom: parseNullableInt(data.fixedGuestCountTom),
                 fixedGuestCountEve: parseNullableInt(data.fixedGuestCountEve),
                 includeChildren: data.includeChildren,
                 guestCountBasis: data.guestCountBasis,
                 paymentResponsibility: data.paymentResponsibility,
-                customTomPercentage: data.customTomPercentage,
-                customEvePercentage: data.customEvePercentage,
+                customTomPercentage: parseNullableFloat(data.customTomPercentage),
+                customEvePercentage: parseNullableFloat(data.customEvePercentage),
                 allocationMode: data.allocationMode,
                 remainingResponsibility: data.remainingResponsibility,
-                customRemainingTomPercentage: data.customRemainingTomPercentage,
-                customRemainingEvePercentage: data.customRemainingEvePercentage,
+                customRemainingTomPercentage: parseNullableFloat(data.customRemainingTomPercentage),
+                customRemainingEvePercentage: parseNullableFloat(data.customRemainingEvePercentage),
                 notes: data.notes,
             },
         });
