@@ -89,15 +89,37 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
 
     const handleEditVendor = async (data: any) => {
         setSubmitting(true);
-        await fetch(`/api/vendors/${params.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
-        setSubmitting(false);
-        setIsEditOpen(false);
-        fetchData();
-        router.refresh(); // Invalider le cache Next.js pour mettre à jour la liste /vendors
+        const { contractFile, ...payload } = data;
+        try {
+            if (contractFile) {
+                const formData = new FormData();
+                formData.append("file", contractFile);
+                const uploadRes = await fetch("/api/vendor-contract", {
+                    method: "POST",
+                    body: formData,
+                });
+                if (!uploadRes.ok) {
+                    throw new Error("Upload failed");
+                }
+                const uploaded = await uploadRes.json();
+                payload.contractUrl = uploaded.url;
+                payload.contractName = uploaded.name;
+            }
+
+            await fetch(`/api/vendors/${params.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            setIsEditOpen(false);
+            fetchData();
+            router.refresh(); // Invalider le cache Next.js pour mettre à jour la liste /vendors
+        } catch (error) {
+            console.error(error);
+            alert("Impossible de mettre a jour le prestataire. Réessayez.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const handleAddPayment = async (data: any) => {
@@ -161,6 +183,17 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
                     </div>
                 </div>
                 <div className="flex gap-2">
+                    {vendor.contractUrl && (
+                        <a
+                            href={vendor.contractUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <Button variant="outline" className="text-slate-600">
+                                <FileText className="w-4 h-4 mr-2" /> Contrat PDF
+                            </Button>
+                        </a>
+                    )}
                     {vendor.status === "ARCHIVÉ" && (
                         <Button onClick={handleRestore} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                             <RefreshCw className="w-4 h-4 mr-2" /> Restaurer le prestataire

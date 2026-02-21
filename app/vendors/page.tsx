@@ -111,14 +111,36 @@ export default function VendorsPage() {
 
     const handleAddVendor = async (data: any) => {
         setSubmitting(true);
-        await fetch("/api/vendors", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
-        setSubmitting(false);
-        setIsAddOpen(false);
-        fetchData();
+        const { contractFile, ...payload } = data;
+        try {
+            if (contractFile) {
+                const formData = new FormData();
+                formData.append("file", contractFile);
+                const uploadRes = await fetch("/api/vendor-contract", {
+                    method: "POST",
+                    body: formData,
+                });
+                if (!uploadRes.ok) {
+                    throw new Error("Upload failed");
+                }
+                const uploaded = await uploadRes.json();
+                payload.contractUrl = uploaded.url;
+                payload.contractName = uploaded.name;
+            }
+
+            await fetch("/api/vendors", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            setIsAddOpen(false);
+            fetchData();
+        } catch (error) {
+            console.error(error);
+            alert("Impossible d'ajouter le prestataire. Réessayez.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (

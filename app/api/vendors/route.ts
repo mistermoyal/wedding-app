@@ -71,6 +71,8 @@ export async function POST(req: Request) {
                 customRemainingTomPercentage: parseNullableFloat(data.customRemainingTomPercentage),
                 customRemainingEvePercentage: parseNullableFloat(data.customRemainingEvePercentage),
                 notes: data.notes,
+                contractUrl: data.contractUrl || null,
+                contractName: data.contractName || null,
             },
         });
         return NextResponse.json(vendor);

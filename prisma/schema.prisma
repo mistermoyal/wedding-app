@@ -36,6 +36,8 @@ model Vendor {
   customRemainingEvePercentage Float?
 
   notes     String?
+  contractUrl  String?
+  contractName String?
   status    String    @default("ACTIF") // ACTIF | ARCHIVÉ
   payments  Payment[]
   createdAt DateTime  @default(now())

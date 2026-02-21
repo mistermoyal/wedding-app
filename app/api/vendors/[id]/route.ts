@@ -49,6 +49,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     try {
         const { id } = await params;
         const data = await req.json();
+        const contractUrl = data.contractUrl === undefined ? undefined : data.contractUrl;
+        const contractName = data.contractName === undefined ? undefined : data.contractName;
         const vendor = await prisma.vendor.update({
             where: { id },
             data: {
@@ -72,6 +74,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
                 customRemainingTomPercentage: parseNullableFloat(data.customRemainingTomPercentage),
                 customRemainingEvePercentage: parseNullableFloat(data.customRemainingEvePercentage),
                 notes: data.notes,
+                contractUrl,
+                contractName,
             },
         });
         return NextResponse.json(vendor);
