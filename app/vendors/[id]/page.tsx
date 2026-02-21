@@ -69,6 +69,8 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [showContract, setShowContract] = useState(false);
+    const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
     const router = useRouter();
 
     const fetchData = () => {
@@ -87,30 +89,33 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
         fetchData();
     }, [params.id]);
 
+    const uploadAttachments = async (files: File[]) => {
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("vendorId", params.id);
+            const uploadRes = await fetch("/api/vendor-attachments", {
+                method: "POST",
+                body: formData,
+            });
+            if (!uploadRes.ok) {
+                throw new Error("Upload failed");
+            }
+        }
+    };
+
     const handleEditVendor = async (data: any) => {
         setSubmitting(true);
-        const { contractFile, ...payload } = data;
+        const { attachmentFiles, ...payload } = data;
         try {
-            if (contractFile) {
-                const formData = new FormData();
-                formData.append("file", contractFile);
-                const uploadRes = await fetch("/api/vendor-contract", {
-                    method: "POST",
-                    body: formData,
-                });
-                if (!uploadRes.ok) {
-                    throw new Error("Upload failed");
-                }
-                const uploaded = await uploadRes.json();
-                payload.contractUrl = uploaded.url;
-                payload.contractName = uploaded.name;
-            }
-
             await fetch(`/api/vendors/${params.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
+            if (attachmentFiles && attachmentFiles.length > 0) {
+                await uploadAttachments(attachmentFiles);
+            }
             setIsEditOpen(false);
             fetchData();
             router.refresh(); // Invalider le cache Next.js pour mettre à jour la liste /vendors
@@ -157,6 +162,30 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
         router.push("/vendors");
     };
 
+    const handleRemoveContract = async () => {
+        setSubmitting(true);
+        try {
+            await fetch(`/api/vendors/${params.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contractUrl: null, contractName: null })
+            });
+            fetchData();
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleDeleteAttachment = async (id: string) => {
+        setSubmitting(true);
+        try {
+            await fetch(`/api/vendor-attachments/${id}`, { method: "DELETE" });
+            fetchData();
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     if (loading) return <div className="p-8 text-slate-500">Chargement des détails...</div>;
     if (!vendor || vendor.error) return <div className="p-8">Prestataire non trouvé</div>;
 
@@ -184,15 +213,23 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
                 </div>
                 <div className="flex gap-2">
                     {vendor.contractUrl && (
-                        <a
-                            href={vendor.contractUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            <Button variant="outline" className="text-slate-600">
+                        <>
+                            <Button
+                                variant="outline"
+                                className="text-slate-600"
+                                onClick={() => setShowContract(true)}
+                            >
                                 <FileText className="w-4 h-4 mr-2" /> Contrat PDF
                             </Button>
-                        </a>
+                            <Button
+                                variant="outline"
+                                className="text-rose-600 hover:text-rose-700"
+                                onClick={handleRemoveContract}
+                                disabled={submitting}
+                            >
+                                Supprimer contrat
+                            </Button>
+                        </>
                     )}
                     {vendor.status === "ARCHIVÉ" && (
                         <Button onClick={handleRestore} className="bg-emerald-600 hover:bg-emerald-700 text-white">
@@ -344,6 +381,59 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
                 <div className="md:col-span-4 space-y-6">
                     <Card className="border-slate-200/60 shadow-sm">
                         <CardHeader>
+                            <CardTitle>Contrats & fichiers</CardTitle>
+                            <CardDescription>PDF, JPG ou PNG associés au prestataire</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Input
+                                type="file"
+                                accept="application/pdf,image/jpeg,image/png"
+                                multiple
+                                onChange={async (e) => {
+                                    const files = Array.from(e.target.files || []);
+                                    if (files.length === 0) return;
+                                    setSubmitting(true);
+                                    try {
+                                        await uploadAttachments(files);
+                                        fetchData();
+                                    } finally {
+                                        setSubmitting(false);
+                                        e.currentTarget.value = "";
+                                    }
+                                }}
+                            />
+                            <div className="space-y-2">
+                                {vendor.attachments?.length ? (
+                                    vendor.attachments.map((attachment: any) => (
+                                        <div
+                                            key={attachment.id}
+                                            className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2 text-sm"
+                                        >
+                                            <button
+                                                type="button"
+                                                className="text-left text-slate-700 hover:text-slate-900"
+                                                onClick={() => setSelectedAttachment(attachment)}
+                                            >
+                                                {attachment.name}
+                                            </button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-rose-600 hover:text-rose-700"
+                                                onClick={() => handleDeleteAttachment(attachment.id)}
+                                            >
+                                                Supprimer
+                                            </Button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-xs text-slate-400">Aucun fichier ajouté.</p>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="border-slate-200/60 shadow-sm">
+                        <CardHeader>
                             <CardTitle className="text-lg">Paramètres</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">
@@ -379,6 +469,59 @@ export default function VendorDetailPage({ params: paramsPromise }: { params: Pr
                     </Card>
                 </div>
             </div>
+
+            <Dialog open={showContract} onOpenChange={setShowContract}>
+                <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                        <DialogTitle>Contrat PDF</DialogTitle>
+                        <DialogDescription>
+                            {vendor.contractName || "Contrat du prestataire"}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {vendor.contractUrl ? (
+                        <iframe
+                            title="Contrat PDF"
+                            src={vendor.contractUrl}
+                            className="h-[70vh] w-full rounded-lg border"
+                        />
+                    ) : (
+                        <div className="text-sm text-slate-500">Aucun contrat disponible.</div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            <Dialog
+                open={!!selectedAttachment}
+                onOpenChange={(open) => {
+                    if (!open) setSelectedAttachment(null);
+                }}
+            >
+                <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                        <DialogTitle>Fichier</DialogTitle>
+                        <DialogDescription>
+                            {selectedAttachment?.name || "Aperçu"}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {selectedAttachment?.url ? (
+                        selectedAttachment?.contentType?.startsWith("image/") ? (
+                            <img
+                                src={selectedAttachment.url}
+                                alt={selectedAttachment.name}
+                                className="max-h-[70vh] w-full rounded-lg border object-contain"
+                            />
+                        ) : (
+                            <iframe
+                                title="Fichier"
+                                src={selectedAttachment.url}
+                                className="h-[70vh] w-full rounded-lg border"
+                            />
+                        )
+                    ) : (
+                        <div className="text-sm text-slate-500">Aucun fichier disponible.</div>
+                    )}
+                </DialogContent>
+            </Dialog>
 
             <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <DialogContent>

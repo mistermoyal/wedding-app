@@ -36,7 +36,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         const { id } = await params;
         const vendor = await prisma.vendor.findUnique({
             where: { id },
-            include: { payments: true },
+            include: { payments: true, attachments: true },
         });
         if (!vendor) return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
         return NextResponse.json(vendor);

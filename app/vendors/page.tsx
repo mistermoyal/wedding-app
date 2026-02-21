@@ -109,30 +109,37 @@ export default function VendorsPage() {
             return statsB.totalAmount - statsA.totalAmount;
         });
 
+    const uploadAttachments = async (vendorId: string, files: File[]) => {
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("vendorId", vendorId);
+            const uploadRes = await fetch("/api/vendor-attachments", {
+                method: "POST",
+                body: formData,
+            });
+            if (!uploadRes.ok) {
+                throw new Error("Upload failed");
+            }
+        }
+    };
+
     const handleAddVendor = async (data: any) => {
         setSubmitting(true);
-        const { contractFile, ...payload } = data;
+        const { attachmentFiles, ...payload } = data;
         try {
-            if (contractFile) {
-                const formData = new FormData();
-                formData.append("file", contractFile);
-                const uploadRes = await fetch("/api/vendor-contract", {
-                    method: "POST",
-                    body: formData,
-                });
-                if (!uploadRes.ok) {
-                    throw new Error("Upload failed");
-                }
-                const uploaded = await uploadRes.json();
-                payload.contractUrl = uploaded.url;
-                payload.contractName = uploaded.name;
-            }
-
-            await fetch("/api/vendors", {
+            const res = await fetch("/api/vendors", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
+            if (!res.ok) {
+                throw new Error("Create vendor failed");
+            }
+            const created = await res.json();
+            if (attachmentFiles && attachmentFiles.length > 0) {
+                await uploadAttachments(created.id, attachmentFiles);
+            }
             setIsAddOpen(false);
             fetchData();
         } catch (error) {

@@ -41,7 +41,7 @@ export function VendorForm({ initialData, onSubmit, onCancel, loading }: VendorF
         customRemainingEvePercentage: initialData?.customRemainingEvePercentage ?? 50,
         additionalFees: initialData?.additionalFees ?? 0,
         notes: initialData?.notes || "",
-        contractFile: null as File | null,
+        attachmentFiles: [] as File[],
     });
 
     const handleChange = (field: string, value: any) => {
@@ -304,23 +304,16 @@ export function VendorForm({ initialData, onSubmit, onCancel, loading }: VendorF
             </div>
 
             <div className="space-y-2">
-                <Label className="text-slate-700 font-semibold">Contrat (PDF)</Label>
-                {initialData?.contractUrl && (
-                    <a
-                        href={initialData.contractUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs text-slate-500 underline underline-offset-4"
-                    >
-                        Voir le contrat actuel
-                    </a>
-                )}
+                <Label className="text-slate-700 font-semibold">Contrats / Fichiers</Label>
                 <Input
                     type="file"
-                    accept="application/pdf"
-                    onChange={(e) => handleChange("contractFile", e.target.files?.[0] || null)}
+                    accept="application/pdf,image/jpeg,image/png"
+                    multiple
+                    onChange={(e) => handleChange("attachmentFiles", Array.from(e.target.files || []))}
                 />
-                <p className="text-[10px] text-slate-400 italic">PDF uniquement. Laisser vide pour ne pas remplacer.</p>
+                <p className="text-[10px] text-slate-400 italic">
+                    PDF ou images (JPG/PNG). Vous pouvez en ajouter plusieurs.
+                </p>
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
