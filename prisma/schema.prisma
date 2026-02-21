@@ -65,8 +65,10 @@ model Guest {
   rsvp             String   @default("PENDING") // YES | NO | PENDING
   numGuests        Int      @default(1) // Invited Adults
   numChildren3to13 Int      @default(0) // Invited Kids
+  numChildren0to3  Int      @default(0) // Invited Toddlers (0-3)
   numAdultsPresent Int      @default(0) // Coming Adults
   numChildrenPresent Int    @default(0) // Coming Kids
+  numChildren0to3Present Int @default(0) // Coming Toddlers (0-3)
   numNotPresent    Int      @default(0)
   numPresent       Int      @default(0)
   notes            String?
