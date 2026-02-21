@@ -269,8 +269,16 @@ export default function GuestsPage() {
                                     <span className="text-lg font-bold text-slate-900">{childStats.total0to3}</span>
                                 </div>
                                 <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                                    <span>Tom: {childStats.tom0to3}</span>
-                                    <span>Eve: {childStats.eve0to3}</span>
+                                    {activeTab === "all" ? (
+                                        <>
+                                            <span>Tom: {childStats.tom0to3}</span>
+                                            <span>Eve: {childStats.eve0to3}</span>
+                                        </>
+                                    ) : activeTab === "tom" ? (
+                                        <span>Tom: {childStats.tom0to3}</span>
+                                    ) : (
+                                        <span>Eve: {childStats.eve0to3}</span>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -284,8 +292,16 @@ export default function GuestsPage() {
                                     <span className="text-lg font-bold text-slate-900">{childStats.total3to13}</span>
                                 </div>
                                 <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                                    <span>Tom: {childStats.tom3to13}</span>
-                                    <span>Eve: {childStats.eve3to13}</span>
+                                    {activeTab === "all" ? (
+                                        <>
+                                            <span>Tom: {childStats.tom3to13}</span>
+                                            <span>Eve: {childStats.eve3to13}</span>
+                                        </>
+                                    ) : activeTab === "tom" ? (
+                                        <span>Tom: {childStats.tom3to13}</span>
+                                    ) : (
+                                        <span>Eve: {childStats.eve3to13}</span>
+                                    )}
                                 </div>
                             </div>
                         </div>
